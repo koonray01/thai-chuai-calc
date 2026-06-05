@@ -167,7 +167,10 @@ export default function Home() {
         </section>
 
         <footer className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 text-sm leading-7 text-slate-600">
-          เว็บไซต์นี้เป็นเครื่องมือคำนวณอย่างไม่เป็นทางการ ไม่ใช่เว็บไซต์ของหน่วยงานรัฐ กรุณาตรวจสอบสิทธิและข้อมูลจริงผ่านแอปเป๋าตังหรือช่องทางทางการของโครงการ
+          <p>
+            เว็บไซต์นี้เป็นเครื่องมือคำนวณอย่างไม่เป็นทางการ ไม่ใช่เว็บไซต์ของหน่วยงานรัฐ กรุณาตรวจสอบสิทธิและข้อมูลจริงผ่านแอปเป๋าตังหรือช่องทางทางการของโครงการ
+          </p>
+          <p className="mt-3 font-medium text-slate-500">Developed by Aphichat Kaewphilarom</p>
         </footer>
       </div>
     </main>
