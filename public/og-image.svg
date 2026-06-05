@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0f172a"/>
+  <circle cx="1040" cy="120" r="220" fill="#38bdf8" opacity="0.35"/>
+  <circle cx="160" cy="520" r="260" fill="#f59e0b" opacity="0.28"/>
+  <text x="90" y="190" fill="#ffffff" font-size="70" font-family="Arial, sans-serif" font-weight="700">คำนวณไทยช่วยไทย</text>
+  <text x="90" y="290" fill="#e2e8f0" font-size="52" font-family="Arial, sans-serif" font-weight="700">พลัส 60/40</text>
+  <text x="90" y="390" fill="#cbd5e1" font-size="34" font-family="Arial, sans-serif">กรอกเงินรัฐที่เหลือ แล้วดูว่าซื้อได้สูงสุดกี่บาท</text>
+</svg>
