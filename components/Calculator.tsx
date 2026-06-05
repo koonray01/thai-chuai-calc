@@ -12,19 +12,50 @@ type Mode = "government-left" | "total-price";
 
 const quickAmounts = [200, 150, 100, 50, 30];
 
+function normalizeMoneyInput(value: string): string | null {
+  const normalized = value.trim().replace(",", ".");
+
+  if (normalized === "") {
+    return "";
+  }
+
+  if (!/^\d*\.?\d*$/.test(normalized)) {
+    return null;
+  }
+
+  if (normalized === ".") {
+    return "0.";
+  }
+
+  const [wholePart, decimalPart] = normalized.split(".");
+  const wholeWithoutLeadingZero = wholePart.replace(/^0+(?=\d)/, "");
+  const whole = wholeWithoutLeadingZero || "0";
+
+  if (normalized.includes(".")) {
+    return `${whole}.${decimalPart ?? ""}`;
+  }
+
+  return whole;
+}
+
+function parseMoneyInput(value: string): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 export default function Calculator() {
   const [mode, setMode] = useState<Mode>("government-left");
-  const [governmentLeft, setGovernmentLeft] = useState<number>(200);
-  const [totalPrice, setTotalPrice] = useState<number>(333.33);
+  const [governmentLeft, setGovernmentLeft] = useState("200");
+  const [totalPrice, setTotalPrice] = useState("333.33");
   const [copied, setCopied] = useState(false);
 
   const resultByGovernment = useMemo(
-    () => calculateFromGovernmentLeft(governmentLeft),
+    () => calculateFromGovernmentLeft(parseMoneyInput(governmentLeft)),
     [governmentLeft]
   );
 
   const resultByPrice = useMemo(
-    () => calculateFromTotalPrice(totalPrice),
+    () => calculateFromTotalPrice(parseMoneyInput(totalPrice)),
     [totalPrice]
   );
 
@@ -88,7 +119,13 @@ export default function Calculator() {
               inputMode="decimal"
               min={0}
               value={governmentLeft}
-              onChange={(event) => setGovernmentLeft(Number(event.target.value))}
+              onChange={(event) => {
+                const nextValue = normalizeMoneyInput(event.target.value);
+
+                if (nextValue !== null) {
+                  setGovernmentLeft(nextValue);
+                }
+              }}
               className="w-full bg-transparent text-3xl font-black text-slate-950 outline-none"
               placeholder="เช่น 200"
             />
@@ -99,7 +136,7 @@ export default function Calculator() {
             {quickAmounts.map((amount) => (
               <button
                 key={amount}
-                onClick={() => setGovernmentLeft(amount)}
+                onClick={() => setGovernmentLeft(String(amount))}
                 className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-slate-900 hover:text-slate-950"
               >
                 {amount} บาท
@@ -134,7 +171,13 @@ export default function Calculator() {
               inputMode="decimal"
               min={0}
               value={totalPrice}
-              onChange={(event) => setTotalPrice(Number(event.target.value))}
+              onChange={(event) => {
+                const nextValue = normalizeMoneyInput(event.target.value);
+
+                if (nextValue !== null) {
+                  setTotalPrice(nextValue);
+                }
+              }}
               className="w-full bg-transparent text-3xl font-black text-slate-950 outline-none"
               placeholder="เช่น 333.33"
             />
