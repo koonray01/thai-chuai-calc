@@ -6,6 +6,15 @@ export type CalculationResult = {
   isOverDailyLimit: boolean;
 };
 
+export type PriceCalculationResult = {
+  totalPrice: number;
+  governmentAvailable: number;
+  governmentPay: number;
+  userPay: number;
+  isOverDailyLimit: boolean;
+  isOverGovernmentAvailable: boolean;
+};
+
 export const SUBSIDY_RATE = 0.6;
 export const USER_RATE = 0.4;
 export const DAILY_GOVERNMENT_LIMIT = 200;
@@ -29,16 +38,24 @@ export function calculateFromGovernmentLeft(governmentLeft: number): Calculation
   };
 }
 
-export function calculateFromTotalPrice(totalPrice: number) {
+export function calculateFromTotalPrice(
+  totalPrice: number,
+  governmentLeft = DAILY_GOVERNMENT_LIMIT
+): PriceCalculationResult {
   const safeTotalPrice = Number.isFinite(totalPrice) ? Math.max(totalPrice, 0) : 0;
-  const governmentPay = Math.min(safeTotalPrice * SUBSIDY_RATE, DAILY_GOVERNMENT_LIMIT);
+  const safeGovernmentLeft = Number.isFinite(governmentLeft) ? Math.max(governmentLeft, 0) : 0;
+  const governmentAvailable = Math.min(safeGovernmentLeft, DAILY_GOVERNMENT_LIMIT);
+  const governmentByRate = safeTotalPrice * SUBSIDY_RATE;
+  const governmentPay = Math.min(governmentByRate, governmentAvailable);
   const userPay = safeTotalPrice - governmentPay;
 
   return {
     totalPrice: roundMoney(safeTotalPrice),
+    governmentAvailable: roundMoney(governmentAvailable),
     governmentPay: roundMoney(governmentPay),
     userPay: roundMoney(userPay),
-    isOverDailyLimit: safeTotalPrice * SUBSIDY_RATE > DAILY_GOVERNMENT_LIMIT,
+    isOverDailyLimit: governmentByRate > DAILY_GOVERNMENT_LIMIT,
+    isOverGovernmentAvailable: governmentByRate > governmentAvailable,
   };
 }
 

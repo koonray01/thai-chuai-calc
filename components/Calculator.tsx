@@ -54,6 +54,7 @@ export default function Calculator() {
   const [mode, setMode] = useState<Mode>("government-left");
   const [governmentLeft, setGovernmentLeft] = useState("200");
   const [totalPrice, setTotalPrice] = useState("333.33");
+  const [merchantGovernmentLeft, setMerchantGovernmentLeft] = useState("");
   const [copied, setCopied] = useState(false);
 
   const resultByGovernment = useMemo(
@@ -61,10 +62,15 @@ export default function Calculator() {
     [governmentLeft]
   );
 
+  const merchantGovernmentInput =
+    merchantGovernmentLeft === "" ? DAILY_GOVERNMENT_LIMIT : parseMoneyInput(merchantGovernmentLeft);
+
   const resultByPrice = useMemo(
-    () => calculateFromTotalPrice(parseMoneyInput(totalPrice)),
-    [totalPrice]
+    () => calculateFromTotalPrice(parseMoneyInput(totalPrice), merchantGovernmentInput),
+    [merchantGovernmentInput, totalPrice]
   );
+
+  const hasCustomMerchantGovernmentLeft = merchantGovernmentLeft !== "";
 
   const shareText =
     mode === "government-left"
@@ -74,6 +80,7 @@ export default function Calculator() {
 รัฐช่วยจ่าย ${formatBaht(resultByGovernment.governmentPay)} บาท
 คำนวณได้ที่ https://thai-chuai-calc.vercel.app/`
       : `ราคาสินค้า ${formatBaht(resultByPrice.totalPrice)} บาท
+เงินรัฐที่ใช้คำนวณ ${formatBaht(resultByPrice.governmentAvailable)} บาท
 เราจ่ายเองประมาณ ${formatBaht(resultByPrice.userPay)} บาท
 รัฐช่วยจ่าย ${formatBaht(resultByPrice.governmentPay)} บาท
 คำนวณได้ที่ https://thai-chuai-calc.vercel.app/`;
@@ -214,9 +221,42 @@ export default function Calculator() {
             <span className="text-lg font-bold text-slate-500">บาท</span>
           </div>
 
-          {resultByPrice.isOverDailyLimit && (
+          <label htmlFor="merchantGovernmentLeft" className="mt-5 block text-sm font-bold text-slate-700">
+            เงินรัฐที่ลูกค้าเหลือ <span className="font-medium text-slate-500">(ไม่บังคับ)</span>
+          </label>
+          <div className="mt-3 flex items-center rounded-xl border border-slate-200 bg-white px-4 py-3 focus-within:border-slate-900">
+            <input
+              id="merchantGovernmentLeft"
+              type="number"
+              inputMode="decimal"
+              min={0}
+              value={merchantGovernmentLeft}
+              onChange={(event) => {
+                const nextValue = normalizeMoneyInput(event.target.value);
+
+                if (nextValue !== null) {
+                  setMerchantGovernmentLeft(nextValue);
+                }
+              }}
+              className="w-full bg-transparent text-2xl font-black text-slate-950 outline-none"
+              placeholder="เว้นว่าง = 200"
+            />
+            <span className="text-lg font-bold text-slate-500">บาท</span>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            ถ้าลูกค้าเหลือไม่เต็ม 200 บาท ให้กรอกยอดที่เห็นในแอป ระบบจะใช้ยอดนี้เป็นเพดานรัฐช่วยจ่าย
+          </p>
+
+          {hasCustomMerchantGovernmentLeft && merchantGovernmentInput > DAILY_GOVERNMENT_LIMIT && (
             <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm font-medium text-amber-800">
-              ยอดนี้เกินเพดานรัฐช่วยจ่ายต่อวันแล้ว รัฐช่วยสูงสุด {DAILY_GOVERNMENT_LIMIT} บาท ส่วนที่เกินคุณต้องจ่ายเองเต็มจำนวน
+              เงินรัฐต่อวันใช้คำนวณได้สูงสุด {DAILY_GOVERNMENT_LIMIT} บาท ระบบจึงคำนวณจากเพดานรัฐช่วยจ่ายต่อวัน
+            </p>
+          )}
+
+          {resultByPrice.isOverGovernmentAvailable && (
+            <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm font-medium text-amber-800">
+              ยอดนี้ใช้เงินรัฐเกินเงินรัฐที่ลูกค้าเหลือ รัฐช่วยได้สูงสุด {formatBaht(resultByPrice.governmentAvailable)} บาท
+              ส่วนที่เกินลูกค้าต้องจ่ายเองเต็มจำนวน
             </p>
           )}
 
@@ -225,6 +265,7 @@ export default function Calculator() {
             mainValue={`ลูกค้าจ่ายเองประมาณ ${formatBaht(resultByPrice.userPay)} บาท`}
             rows={[
               ["รัฐช่วยจ่าย", `${formatBaht(resultByPrice.governmentPay)} บาท`],
+              ["เงินรัฐที่ใช้คำนวณ", `${formatBaht(resultByPrice.governmentAvailable)} บาท`],
               ["ยอดสินค้ารวม", `${formatBaht(resultByPrice.totalPrice)} บาท`],
             ]}
           />
