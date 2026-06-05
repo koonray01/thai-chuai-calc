@@ -1,24 +1,33 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const siteUrl = "https://thai-chuai-thai-calculator.vercel.app";
+const siteUrl = "https://thai-chuai-calc.vercel.app";
+
+const title = "เงินรัฐเหลือเท่านี้ ต้องซื้อของกี่บาท? | คำนวณไทยช่วยไทย พลัส 60/40";
+const description =
+  "กรอกเงินรัฐที่เหลือวันนี้ แล้วคำนวณทันทีว่าควรซื้อของไม่เกินกี่บาท เพื่อใช้สิทธิไทยช่วยไทย พลัส 60/40 ให้หมดพอดี พร้อมคำนวณเราจ่าย 40% และรัฐช่วย 60%";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "คำนวณไทยช่วยไทย พลัส 60/40 | ซื้อได้สูงสุดกี่บาท",
-    template: "%s | คำนวณไทยช่วยไทย พลัส",
+    default: title,
+    template: "%s | คำนวณไทยช่วยไทย พลัส 60/40",
   },
-  description:
-    "กรอกเงินรัฐที่เหลือวันนี้ แล้วคำนวณทันทีว่าไทยช่วยไทย พลัส 60/40 ซื้อของได้สูงสุดกี่บาท คุณจ่ายเองเท่าไหร่ และรัฐช่วยจ่ายเท่าไหร่",
+  description,
   keywords: [
     "คำนวณไทยช่วยไทย",
-    "ไทยช่วยไทย พลัส",
+    "คำนวณไทยช่วยไทย พลัส",
     "ไทยช่วยไทย 60/40",
     "เงินรัฐเหลือ 200 ซื้อได้กี่บาท",
-    "คำนวณสิทธิรัฐ",
-    "เครื่องคิดเงินไทยช่วยไทย",
-    "รัฐช่วยจ่าย 60",
+    "เงินรัฐเหลือ 150 ซื้อได้กี่บาท",
+    "เงินรัฐเหลือ 100 ซื้อได้กี่บาท",
+    "รัฐช่วยจ่าย 60%",
+    "เราจ่าย 40%",
+    "แอปเป๋าตัง",
+    "G-Wallet",
+    "ร้านค้าถุงเงิน",
+    "ยอดซื้อคุ้มสุดต่อวัน",
+    "ใช้สิทธิให้หมดพอดี",
   ],
   authors: [{ name: "Aphichat Kaewphilarom" }],
   creator: "Aphichat Kaewphilarom",
@@ -26,17 +35,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "th_TH",
     url: siteUrl,
-    title: "คำนวณไทยช่วยไทย พลัส 60/40",
+    title: "เงินรัฐเหลือเท่านี้ ต้องซื้อของกี่บาท?",
     description:
-      "กรอกเงินรัฐที่เหลือวันนี้ แล้วดูทันทีว่าซื้อของได้สูงสุดกี่บาทให้ใช้สิทธิหมดพอดี",
-    siteName: "คำนวณไทยช่วยไทย พลัส",
-    images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: "คำนวณไทยช่วยไทย พลัส 60/40" }],
+      "คำนวณยอดซื้อจากเงินรัฐที่เหลือ เพื่อใช้สิทธิไทยช่วยไทย พลัส 60/40 ให้หมดพอดี",
+    siteName: "คำนวณไทยช่วยไทย พลัส 60/40",
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: "เงินรัฐเหลือเท่านี้ ต้องซื้อของกี่บาท",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "คำนวณไทยช่วยไทย พลัส 60/40",
+    title: "เงินรัฐเหลือเท่านี้ ต้องซื้อของกี่บาท?",
     description:
-      "กรอกเงินรัฐที่เหลือวันนี้ แล้วดูทันทีว่าซื้อของได้สูงสุดกี่บาทให้ใช้สิทธิหมดพอดี",
+      "คำนวณยอดซื้อจากเงินรัฐที่เหลือ เพื่อใช้สิทธิไทยช่วยไทย พลัส 60/40 ให้หมดพอดี",
     images: ["/og-image.svg"],
   },
   alternates: {
@@ -58,7 +74,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0f172a",
+  themeColor: "#f8fafc",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

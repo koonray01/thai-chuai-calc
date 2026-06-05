@@ -10,7 +10,14 @@ import {
 
 type Mode = "government-left" | "total-price";
 
-const quickAmounts = [200, 150, 100, 50, 30];
+const quickAmounts = [
+  { label: "เต็มวัน 200", value: 200 },
+  { label: "เหลือ 150", value: 150 },
+  { label: "ครึ่งสิทธิ 100", value: 100 },
+  { label: "เหลือ 80", value: 80 },
+  { label: "เหลือ 50", value: 50 },
+  { label: "เหลือ 30", value: 30 },
+];
 
 function normalizeMoneyInput(value: string): string | null {
   const normalized = value.trim().replace(",", ".");
@@ -59,22 +66,21 @@ export default function Calculator() {
     [totalPrice]
   );
 
-  const copyResult = async () => {
-    const text =
-      mode === "government-left"
-        ? `ไทยช่วยไทย พลัส 60/40\nเงินรัฐที่เหลือ: ${formatBaht(
-            resultByGovernment.governmentPay
-          )} บาท\nซื้อของได้สูงสุด: ${formatBaht(
-            resultByGovernment.maxPurchaseAmount
-          )} บาท\nเราจ่ายเอง: ${formatBaht(resultByGovernment.userPay)} บาท`
-        : `ไทยช่วยไทย พลัส 60/40\nราคาสินค้า: ${formatBaht(
-            resultByPrice.totalPrice
-          )} บาท\nรัฐช่วยจ่าย: ${formatBaht(
-            resultByPrice.governmentPay
-          )} บาท\nเราจ่ายเอง: ${formatBaht(resultByPrice.userPay)} บาท`;
+  const shareText =
+    mode === "government-left"
+      ? `เงินรัฐเหลือ ${formatBaht(resultByGovernment.governmentPay)} บาท
+ควรซื้อของไม่เกิน ${formatBaht(resultByGovernment.maxPurchaseAmount)} บาท
+เราจ่ายเองประมาณ ${formatBaht(resultByGovernment.userPay)} บาท
+รัฐช่วยจ่าย ${formatBaht(resultByGovernment.governmentPay)} บาท
+คำนวณได้ที่ https://thai-chuai-calc.vercel.app/`
+      : `ราคาสินค้า ${formatBaht(resultByPrice.totalPrice)} บาท
+เราจ่ายเองประมาณ ${formatBaht(resultByPrice.userPay)} บาท
+รัฐช่วยจ่าย ${formatBaht(resultByPrice.governmentPay)} บาท
+คำนวณได้ที่ https://thai-chuai-calc.vercel.app/`;
 
+  const copyResult = async () => {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(shareText);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
@@ -82,37 +88,60 @@ export default function Calculator() {
     }
   };
 
+  const shareResult = async () => {
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({
+          title: "คำนวณไทยช่วยไทย พลัส 60/40",
+          text: shareText,
+          url: "https://thai-chuai-calc.vercel.app/",
+        });
+        return;
+      } catch {
+        return;
+      }
+    }
+
+    await copyResult();
+  };
+
   return (
-    <section className="mx-auto w-full max-w-3xl rounded-[2rem] border border-white/70 bg-white/90 p-5 shadow-soft backdrop-blur md:p-8">
-      <div className="grid gap-3 rounded-2xl bg-slate-100 p-1 sm:grid-cols-2">
+    <section className="mx-auto w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+      <div className="grid gap-2 rounded-xl bg-slate-100 p-1 sm:grid-cols-2">
         <button
           onClick={() => setMode("government-left")}
-          className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
+          className={`rounded-lg px-4 py-3 text-sm font-bold transition ${
             mode === "government-left"
               ? "bg-slate-950 text-white shadow"
               : "text-slate-600 hover:bg-white"
           }`}
         >
-          เงินรัฐเหลือวันนี้
+          ผู้ใช้สิทธิ
         </button>
         <button
           onClick={() => setMode("total-price")}
-          className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
+          className={`rounded-lg px-4 py-3 text-sm font-bold transition ${
             mode === "total-price"
               ? "bg-slate-950 text-white shadow"
               : "text-slate-600 hover:bg-white"
           }`}
         >
-          ราคาสินค้า
+          ร้านค้า / ราคาสินค้า
         </button>
       </div>
 
+      <p className="mt-3 text-sm leading-6 text-slate-600">
+        {mode === "government-left"
+          ? "กรอกเงินรัฐที่เหลือ แล้วคำนวณยอดซื้อสูงสุด"
+          : "กรอกราคาสินค้า แล้วคำนวณว่าลูกค้าจ่ายเองเท่าไหร่ รัฐช่วยเท่าไหร่"}
+      </p>
+
       {mode === "government-left" ? (
-        <div className="mt-8">
+        <div className="mt-6">
           <label htmlFor="governmentLeft" className="text-sm font-bold text-slate-700">
-            กรอกเงินรัฐที่เหลือในวันนี้
+            เงินรัฐที่เหลือวันนี้
           </label>
-          <div className="mt-3 flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-3 focus-within:border-slate-900">
+          <div className="mt-3 flex items-center rounded-xl border border-slate-200 bg-white px-4 py-3 focus-within:border-slate-900">
             <input
               id="governmentLeft"
               type="number"
@@ -135,36 +164,37 @@ export default function Calculator() {
           <div className="mt-4 flex flex-wrap gap-2">
             {quickAmounts.map((amount) => (
               <button
-                key={amount}
-                onClick={() => setGovernmentLeft(String(amount))}
+                key={amount.value}
+                onClick={() => setGovernmentLeft(String(amount.value))}
                 className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-slate-900 hover:text-slate-950"
               >
-                {amount} บาท
+                {amount.label}
               </button>
             ))}
           </div>
 
           {resultByGovernment.isOverDailyLimit && (
-            <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-medium text-amber-800">
-              วงเงินรัฐต่อวันถูกจำกัดที่ {DAILY_GOVERNMENT_LIMIT} บาท ระบบจึงคำนวณจาก {DAILY_GOVERNMENT_LIMIT} บาท
+            <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm font-medium text-amber-800">
+              เงินรัฐต่อวันใช้คำนวณได้สูงสุด {DAILY_GOVERNMENT_LIMIT} บาท ระบบจึงคำนวณจากเพดานรัฐช่วยจ่ายต่อวัน
             </p>
           )}
 
           <ResultCard
-            headline="วันนี้ซื้อของได้สูงสุด"
-            mainValue={`${formatBaht(resultByGovernment.maxPurchaseAmount)} บาท`}
+            headline={`ถ้าเงินรัฐเหลือ ${formatBaht(resultByGovernment.governmentPay)} บาท`}
+            mainValue={`วันนี้คุณควรซื้อของไม่เกิน ${formatBaht(resultByGovernment.maxPurchaseAmount)} บาท`}
             rows={[
+              ["คุณจ่ายเองประมาณ", `${formatBaht(resultByGovernment.userPay)} บาท`],
               ["รัฐช่วยจ่าย", `${formatBaht(resultByGovernment.governmentPay)} บาท`],
-              ["คุณจ่ายเอง", `${formatBaht(resultByGovernment.userPay)} บาท`],
             ]}
+            note="แนะนำให้ซื้อของไม่เกินยอดนี้ เพื่อใช้สิทธิรัฐให้หมดพอดี"
           />
         </div>
       ) : (
-        <div className="mt-8">
+        <div className="mt-6">
           <label htmlFor="totalPrice" className="text-sm font-bold text-slate-700">
-            กรอกราคาสินค้า/บริการ
+            ราคาสินค้า / บริการ
           </label>
-          <div className="mt-3 flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-3 focus-within:border-slate-900">
+          <div className="mt-3 flex items-center rounded-xl border border-slate-200 bg-white px-4 py-3 focus-within:border-slate-900">
             <input
               id="totalPrice"
               type="number"
@@ -185,28 +215,36 @@ export default function Calculator() {
           </div>
 
           {resultByPrice.isOverDailyLimit && (
-            <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-medium text-amber-800">
-              ราคานี้ใช้เงินรัฐเกินเพดาน {DAILY_GOVERNMENT_LIMIT} บาท ส่วนที่เกินผู้ซื้อจะจ่ายเองเพิ่ม
+            <p className="mt-4 rounded-xl bg-amber-50 p-4 text-sm font-medium text-amber-800">
+              ยอดนี้เกินเพดานรัฐช่วยจ่ายต่อวันแล้ว รัฐช่วยสูงสุด {DAILY_GOVERNMENT_LIMIT} บาท ส่วนที่เกินคุณต้องจ่ายเองเต็มจำนวน
             </p>
           )}
 
           <ResultCard
-            headline="สรุปยอดจ่าย"
-            mainValue={`คุณจ่ายเอง ${formatBaht(resultByPrice.userPay)} บาท`}
+            headline={`ราคาสินค้า ${formatBaht(resultByPrice.totalPrice)} บาท`}
+            mainValue={`ลูกค้าจ่ายเองประมาณ ${formatBaht(resultByPrice.userPay)} บาท`}
             rows={[
-              ["ราคาสินค้า", `${formatBaht(resultByPrice.totalPrice)} บาท`],
               ["รัฐช่วยจ่าย", `${formatBaht(resultByPrice.governmentPay)} บาท`],
+              ["ยอดสินค้ารวม", `${formatBaht(resultByPrice.totalPrice)} บาท`],
             ]}
           />
         </div>
       )}
 
-      <button
-        onClick={copyResult}
-        className="mt-6 w-full rounded-2xl bg-slate-950 px-5 py-4 text-base font-black text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
-      >
-        {copied ? "คัดลอกแล้ว" : "คัดลอกผลลัพธ์"}
-      </button>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <button
+          onClick={copyResult}
+          className="rounded-xl bg-slate-950 px-5 py-4 text-base font-black text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
+        >
+          {copied ? "คัดลอกแล้ว" : "คัดลอกผลลัพธ์"}
+        </button>
+        <button
+          onClick={shareResult}
+          className="rounded-xl border border-slate-300 bg-white px-5 py-4 text-base font-black text-slate-950 transition hover:-translate-y-0.5 hover:border-slate-950"
+        >
+          แชร์ให้เพื่อน
+        </button>
+      </div>
     </section>
   );
 }
@@ -215,23 +253,26 @@ function ResultCard({
   headline,
   mainValue,
   rows,
+  note,
 }: {
   headline: string;
   mainValue: string;
   rows: [string, string][];
+  note?: string;
 }) {
   return (
-    <div className="mt-6 rounded-[1.5rem] bg-gradient-to-br from-slate-950 to-slate-800 p-6 text-white">
+    <div className="mt-6 rounded-2xl bg-slate-950 p-5 text-white md:p-6">
       <p className="text-sm font-bold text-slate-300">{headline}</p>
-      <p className="mt-2 text-3xl font-black leading-tight md:text-5xl">{mainValue}</p>
+      <p className="mt-2 text-3xl font-black leading-tight md:text-4xl">{mainValue}</p>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {rows.map(([label, value]) => (
-          <div key={label} className="rounded-2xl bg-white/10 p-4">
+          <div key={label} className="rounded-xl bg-white/10 p-4">
             <p className="text-sm text-slate-300">{label}</p>
             <p className="mt-1 text-xl font-black">{value}</p>
           </div>
         ))}
       </div>
+      {note ? <p className="mt-5 rounded-xl bg-white/10 p-4 text-sm leading-6 text-slate-100">{note}</p> : null}
     </div>
   );
 }

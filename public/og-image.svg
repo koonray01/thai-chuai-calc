@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0f172a"/>
-  <circle cx="1040" cy="120" r="220" fill="#38bdf8" opacity="0.35"/>
-  <circle cx="160" cy="520" r="260" fill="#f59e0b" opacity="0.28"/>
-  <text x="90" y="190" fill="#ffffff" font-size="70" font-family="Arial, sans-serif" font-weight="700">คำนวณไทยช่วยไทย</text>
-  <text x="90" y="290" fill="#e2e8f0" font-size="52" font-family="Arial, sans-serif" font-weight="700">พลัส 60/40</text>
-  <text x="90" y="390" fill="#cbd5e1" font-size="34" font-family="Arial, sans-serif">กรอกเงินรัฐที่เหลือ แล้วดูว่าซื้อได้สูงสุดกี่บาท</text>
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <rect x="72" y="72" width="1056" height="486" rx="32" fill="#ffffff" stroke="#cbd5e1" stroke-width="4"/>
+  <text x="120" y="185" fill="#0f172a" font-size="64" font-family="Arial, sans-serif" font-weight="700">เงินรัฐเหลือเท่านี้</text>
+  <text x="120" y="275" fill="#0f172a" font-size="64" font-family="Arial, sans-serif" font-weight="700">ต้องซื้อของกี่บาท?</text>
+  <text x="120" y="365" fill="#334155" font-size="36" font-family="Arial, sans-serif">คำนวณไทยช่วยไทย พลัส 60/40</text>
+  <text x="120" y="430" fill="#475569" font-size="30" font-family="Arial, sans-serif">กรอกเงินรัฐที่เหลือ แล้วดูยอดซื้อสูงสุดทันที</text>
+  <rect x="120" y="472" width="320" height="54" rx="16" fill="#0f172a"/>
+  <text x="150" y="509" fill="#ffffff" font-size="26" font-family="Arial, sans-serif" font-weight="700">ใช้สิทธิให้หมดพอดี</text>
 </svg>
